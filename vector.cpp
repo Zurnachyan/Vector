@@ -139,9 +139,8 @@ Vector<bool>::Vector() : _size{}, _capacity{}, _arr{}, _begin{}, _end{} {}
 Vector<bool>::Vector(std::size_t cap) : _size{cap} {
     while(cap) {
         ++_capacity;
-        cap /= sizeof(long) * 8;
+        cap /= sizeof(long) * std::size_t(8);
     }
-
     _arr = new unsigned long[_capacity] {};
 }
 
@@ -149,8 +148,7 @@ Vector<bool>::Vector(const Vector<bool>& oth) {
     _size = oth._size;
     _capacity = oth._capacity;
     _arr = new unsigned long[_capacity];
-
-    for(int i = 0; i < _capacity; ++i) {
+    for(std::size_t i = 0; i < _capacity; ++i) {
         _arr[i] = oth._arr[i];
     }
 }
@@ -160,68 +158,57 @@ Vector<bool>::Vector(Vector<bool>&& oth) : _size{oth._size}, _capacity{oth._capa
     oth._arr = nullptr;
 }
 
-
 // FUNCTIONS FOR BOOL
 void Vector<bool>::push_back(bool value) {
-    if(_capacity == 0) {
+    if(_capacity == std::size_t(0)) {
         _capacity = 1;
         _arr = new unsigned long[_capacity]{};
-    }
-    
-    if((sizeof(long) * 8 * _capacity) == _size) {
+    }    
+    if((sizeof(long) * std::size_t(8) * _capacity) == _size) {
         ++_capacity;
         copy();
     }
-
     if(value) {
-        _arr[0] = _arr[0] | (1 << (_size - 1));
+        _arr[0] = _arr[0] | (std::size_t(1) << (_size - std::size_t(1)));
     } else {
-        _arr[0] = _arr[0] & ~(1 << (_size - 1));
+        _arr[0] = _arr[0] & ~(std::size_t(1) << (_size - std::size_t(1)));
     }
-
     ++_size;
 }
 
 void Vector<bool>::pop_back() {
-    if(_capacity > (--_size / sizeof(long) * 8) && _capacity > 1) {
+    if(_capacity > (--_size / sizeof(long) * std::size_t(8)) && _capacity > std::size_t(1)) {
         --_capacity;
         copy();
     }
-
-    _arr[0] = _arr[0] & ~(1 << (_size - 1));
+    _arr[0] = _arr[0] & ~(std::size_t(1) << (_size - std::size_t(1)));
 }
 
 void Vector<bool>::insert(bool value, std::size_t index) {
     unsigned long* tmp = new unsigned long[_capacity];
-
-    if(index >= _size || index < 0) {
+    if(index >= _size || index < std::size_t(0)) {
         return;
     }
-
     ++_size;
-    if(_capacity <= (_size / (sizeof(long) * 8)) && _capacity > 1) {
+    if(_capacity <= (_size / (sizeof(long) * std::size_t(8))) && _capacity > std::size_t(1)) {
         ++_capacity;
         copy();
     }
-
-    for(int i = 0; i < index; ++i) {
+    for(std::size_t i = 0; i < index; ++i) {
         if(((*_arr >> (i)) & 1)) {
-            tmp[0] = tmp[0] | (1 << (i));
+            tmp[0] = tmp[0] | (std::size_t(1) << (i));
         } else {
-            tmp[0] = tmp[0] & ~(1 << (i));
+            tmp[0] = tmp[0] & ~(std::size_t(1) << (i));
         }
     }
-    
-    tmp[0] = value ? tmp[0] | (1 << (index)) : tmp[0] & ~(1 << (index));
-
-    for(int i = index; i < _size; ++i) {
-        if(((*_arr >> (i)) & 1)) {
-            tmp[0] = tmp[0] | (1 << (i + 1));
+    tmp[0] = value ? tmp[0] | (std::size_t(1) << (index)) : tmp[0] & ~(std::size_t(1) << (index));
+    for(std::size_t i = index; i < _size; ++i) {
+        if(((*_arr >> (i)) & std::size_t(1))) {
+            tmp[0] = tmp[0] | (std::size_t(1) << (i + std::size_t(1)));
         } else {
-            tmp[0] = tmp[0] & ~(1 << (i + 1));
+            tmp[0] = tmp[0] & ~(std::size_t(1) << (i + std::size_t(1)));
         }
     }
-
     delete[] _arr;
     _arr = tmp;
     tmp = nullptr;
@@ -231,30 +218,26 @@ void Vector<bool>::erase(std::size_t index) {
     if(index >= _size || index < 0) {
         return;
     }
-
     --_size;
-    if(_capacity > (_size / (sizeof(long) * 8)) && _capacity > 1) {
+    if(_capacity > (_size / (sizeof(long) * std::size_t(8))) && _capacity > std::size_t(1)) {
         --_capacity;
         copy();
     }
-
     unsigned long* tmp = new unsigned long[_capacity];
-    for(int i = 0; i < index; ++i) {
-        if((*_arr >> (i)) & 1) {
-            tmp[0] = tmp[0] | (1 << (i));
+    for(std::size_t i = 0; i < index; ++i) {
+        if((*_arr >> (i)) & std::size_t(1)) {
+            tmp[0] = tmp[0] | (std::size_t(1) << (i));
         } else {
-            tmp[0] = tmp[0] & ~(1 << (i));
+            tmp[0] = tmp[0] & ~(std::size_t(1) << (i));
         }
     }
-
-    for(int i = index + 1; i < _size; ++i) {
-        if((*_arr >> (i)) & 1) {
-            tmp[0] = tmp[0] | (1 << (i - 1));
+    for(std::size_t i = index + 1; i < _size; ++i) {
+        if((*_arr >> (i)) & std::size_t(1)) {
+            tmp[0] = tmp[0] | (std::size_t(1) << (i - std::size_t(1)));
         } else {
-            tmp[0] = tmp[0] & ~(1 << (i - 1));
+            tmp[0] = tmp[0] & ~(std::size_t(1) << (i - std::size_t(1)));
         }
     }
-
     delete[] _arr;
     _arr = tmp;
     tmp = nullptr;
@@ -262,13 +245,12 @@ void Vector<bool>::erase(std::size_t index) {
 
 void Vector<bool>::reserve(std::size_t cap) {
     _size = cap;
-    if(cap < 8 * sizeof(long)) {
-        _capacity = 1;
+    if(cap < std::size_t(8) * sizeof(long)) {
+        _capacity = std::size_t(1);
     }
-
-    while(cap > 8 * sizeof(long)) {
+    while(cap > std::size_t(8) * sizeof(long)) {
         ++_capacity;
-        cap /= 8;
+        cap /= std::size_t(8);
     }
     copy();
 }
@@ -279,7 +261,7 @@ void Vector<bool>::copy() {
         _arr = new unsigned long[_capacity];
     } else {
         unsigned long* tmp = new unsigned long[_capacity] {0};
-        for(int i = 0; i < _capacity; ++i) {
+        for(std::size_t i = 0; i < _capacity; ++i) {
             tmp[i] = _arr[i];
         }
         delete[] _arr;
@@ -287,7 +269,6 @@ void Vector<bool>::copy() {
         tmp = nullptr;
     }
 }
-
 
 // CONSTRUCTORS
 template <typename T>
@@ -306,7 +287,6 @@ Vector<T>::Vector(std::initializer_list<T>& list) {
     _arr = new T[_capacity];
     _begin = _arr;
     _end = _arr + _size;
-
     auto j = list.begin();
     for(int i = 0; i < _size; ++i, ++j) {
         _arr[i] = *j;
@@ -316,22 +296,19 @@ Vector<T>::Vector(std::initializer_list<T>& list) {
 template<typename T>
 Vector<T>::Vector(const Vector<T>& oth) : _size{oth._size}, _capacity{oth._capacity} {
     _arr = new T[_capacity];
-
-    for(int i = 0; i < _size; ++i) {
+    for(std::size_t i = 0; i < _size; ++i) {
         _arr[i] = oth._arr[i];
     }
-
     _begin = _arr;
-    _end = _arr + (_size - 1);
+    _end = _arr + (_size - std::size_t(1));
 }
 
 template<typename T>
 Vector<T>::Vector(Vector<T>&& oth) : _size{oth._size}, _capacity{oth._capacity}  {
     _arr = oth._arr;
     oth._arr = nullptr;
-
     _begin = _arr;
-    _end = _arr + (_size - 1);
+    _end = _arr + (_size - std::size_t(1));
 }
 
 template<typename T>
@@ -340,44 +317,36 @@ Vector<T>::Vector(const Vector<E>& oth) {
     _size = oth.size();
     _capacity = oth.capacity();
     _arr = new T[_capacity];
-
-    for(int i = 0; i < _size; ++i) {
+    for(std::size_t i = 0; i < _size; ++i) {
         _arr[i] = oth[i];
     }
-
     _begin = _arr;
-    _end = _arr + (_size - 1);
+    _end = _arr + (_size - std::size_t(1));
 }
-
 
 // OPERATORS
 template<typename T>
 Vector<T>& Vector<T>::operator=(const Vector<T>& rhs) {
     _size = rhs._size;
     _capacity = rhs._capacity;
-
     delete[] _arr;
     _arr = new T[_capacity];
-
-    for(int i = 0; i < _size; ++i) {
+    for(std::size_t i = 0; i < _size; ++i) {
         _arr[i] = rhs._arr[i];
     }
-
     _begin = _arr;
-    _end = _arr + (_size - 1);
+    _end = _arr + (_size - std::size_t(1));
 }
 
 template<typename T>
 Vector<T>& Vector<T>::operator=(Vector<T>&& rhs) {
     _size = rhs._size;
     _capacity = rhs._capacity;
-
     delete[] _arr;
     _arr = rhs._arr;
     rhs._arr = nullptr;
-
     _begin = _arr;
-    _end = _arr + (_size - 1);
+    _end = _arr + (_size - std::size_t(1));
 }
 
 template<typename T>
@@ -385,31 +354,26 @@ template<typename E>
 Vector<T>& Vector<T>::operator=(const Vector<E>& rhs) {
     _size = rhs._size;
     _capacity = rhs._capacity;
-
     delete[] _arr;
     _arr = new T[_capacity];
-
-    for(int i = 0; i < _size; ++i) {
+    for(std::size_t i = 0; i < _size; ++i) {
         _arr[i] = rhs[i];
     }
-
     _begin = _arr;
-    _end = _arr + (_size - 1);
+    _end = _arr + (_size - std::size_t(1));
 }
-
 
 // FUNCTIONS
 template<typename T>
 void Vector<T>::push_back(T value) {
-    if(_capacity == 0) {
-        _capacity = 2;
+    if(_capacity == std::size_t(0)) {
+        _capacity = std::size_t(2);
         _arr = new T[_capacity];
         _begin = _arr;
-        _end = _arr + 1;
+        _end = _arr + std::size_t(1);
     }
-
     if(_size == _capacity) {
-        _capacity *= 2;
+        _capacity *= std::size_t(2);
         copy();
     }
     _arr[_size] = value;
@@ -419,8 +383,8 @@ void Vector<T>::push_back(T value) {
 
 template<typename T>
 void Vector<T>::pop_back() {
-    if((_capacity / 2) == _size) {
-        _capacity /= 2;
+    if((_capacity / std::size_t(2)) == _size) {
+        _capacity /= std::size_t(2);
         copy();
     }
     --_size;
@@ -429,49 +393,42 @@ void Vector<T>::pop_back() {
 
 template<typename T>
 void Vector<T>::insert(T value, std::size_t index) {
-    if(index < 0 || index > _size) {
+    if(index < std::size_t(0) || index > _size) {
         return;
     }
-
     if(_capacity == _size) {
-        _capacity *= 2;
+        _capacity *= std::size_t(2);
         copy();
     }
-
-    for(std::size_t i = _size - 1; i > index; --i) {
+    for(std::size_t i = _size - std::size_t(1); i > index; --i) {
         T tmp = _arr[i];
         _arr[i] = _arr[i - 1];
         _arr[i - 1] = tmp;
     }
-
     _arr[index] = value;
-
     _end += 1;
     ++_size;
 }
 
 template<typename T>
 void Vector<T>::insert(std::initializer_list<T>& value, std::size_t index)  {
-    if(index < 0 || index > _size) {
+    if(index < std::size_t(0) || index > _size) {
         return;
     }
-
     _size += value.size();
     if(_capacity <= _size) {
         _capacity = _size;
         copy();
     }
-
     int j = value.size();
     while(j) {
-        for(std::size_t i = _size - 1; i > index; --i) {
+        for(std::size_t i = _size - std::size_t(1); i > index; --i) {
             T tmp = _arr[i];
             _arr[i] = _arr[i - 1];
             _arr[i - 1] = tmp;
         }
         --j;
     }
-
     auto z = value.begin();
     for(int i = index; z < value.end(); ++i, ++z) {
         _arr[i] = *z;
@@ -480,24 +437,20 @@ void Vector<T>::insert(std::initializer_list<T>& value, std::size_t index)  {
 
 template<typename T>
 void Vector<T>::erase(std::size_t index) {
-    if(index > _size || index < 0) {
+    if(index > _size || index < std::size_t(0)) {
         return;
     }
-
-    if((_capacity / 2) == _size) {
-        _capacity /= 2;
+    if((_capacity / std::size_t(2)) == _size) {
+        _capacity /= std::size_t(2);
         copy();
     }
-
     T* tmp = new T[_capacity];
-    for(int i = 0; i < index; ++i) {
+    for(std::size_t i = 0; i < index; ++i) {
         tmp[i] = _arr[i];
     }
-
-    for(int i = index + 1; i < _size; ++i) {
+    for(std::size_t i = index + std::size_t(1); i < _size; ++i) {
         tmp[i - 1] = _arr[i];
     }
-
     delete[] _arr;
     _arr = tmp;
     tmp = nullptr;
@@ -514,15 +467,14 @@ void Vector<T>::reserve(std::size_t cap) {
 
 template<typename T>
 bool Vector<T>::empty() {
-    return _size != 0;
+    return _size != std::size_t(0);
 }
-
 
 // PRIVATE FUNCTION
 template<typename T>
 void Vector<T>::copy() {
     T* tmp = new T[_capacity] {0};
-    for(int i = 0; i < _size; ++i) {
+    for(std::size_t i = 0; i < _size; ++i) {
         tmp[i] = _arr[i];
     }
     delete[] _arr;

@@ -1,0 +1,1 @@
+Here is the implementation of std::vector in my opinion. How to implement std::vector<bool>, which is different from other types of vectors.

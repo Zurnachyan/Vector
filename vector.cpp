@@ -22,8 +22,8 @@ class Vector {
                 friend Iterator operator-(const std::size_t& lhs, const Iterator& rhs) { return lhs - rhs._iter; }
                 Iterator& operator++() { ++_iter; return *this; }
                 Iterator& operator--() { --_iter; return *this; }
-                Iterator operator++(int) { Iterator tmp(*this); ++_iter; return *this; }
-                Iterator operator--(int) { Iterator tmp(*this); --_iter; return *this; }
+                Iterator operator++(int) { Iterator tmp(*this); ++_iter; return tmp; }
+                Iterator operator--(int) { Iterator tmp(*this); --_iter; return tmp; }
                 T& operator*() { return *_iter; } // dereference
                 T* operator->() { return _iter; }
                 T& operator[](std::size_t index) { return _iter[index]; }

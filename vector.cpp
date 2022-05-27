@@ -37,6 +37,7 @@ class Vector {
                 T* _iter;
         };
     public:
+        ~Vector() { delete[] _arr; }
         Vector();
         Vector(std::size_t cap);
         Vector(std::initializer_list<T>& list);
@@ -104,6 +105,7 @@ class Vector<bool> {
                 bool* _iter;
         };
     public:
+        ~Vector() { delete[] _arr; }
         Vector();
         Vector(std::size_t cap);
         Vector(const Vector<bool>& oth);
